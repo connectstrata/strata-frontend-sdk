@@ -4,7 +4,7 @@
 
 1. Generate a signing key
 
-Login to the Strata web app and generate a signing key
+Login to the Strata web app and generate a signing key on the [Settings](https://app.connectstrata.com/settings) page.
 
 2. Create signed user JWT tokens
 
@@ -33,7 +33,7 @@ Install the frontend SDK from npm
 ```typescript
 import Strata from "@strata/frontend-sdk";
 
-const Strata = new Strata();
+const strata = new Strata();
 await strata.authenticate("<your_project_id>", "<signed_user_token");
 ```
 
