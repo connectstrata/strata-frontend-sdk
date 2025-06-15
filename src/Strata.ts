@@ -127,7 +127,7 @@ export default class Strata {
   }
 
   /**
-   * Start an oauth flow for a user to authorize an integration
+   * Authorize an integration for a user
    * @param {string} projectId - The Strata project id
    * @param {string} jwtToken - A signed user JWT token
    * @param {string} serviceProviderId - The service provider id
