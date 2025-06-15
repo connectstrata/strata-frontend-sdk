@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import Strata from "@connectstrata/frontend-sdk";
+import Strata from "@connectstrata/strata-frontend-sdk";
 
 const integrations = [
   {

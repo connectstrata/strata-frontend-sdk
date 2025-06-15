@@ -1,5 +1,5 @@
 {
-  "name": "strata-frontend-sdk",
+  "name": "@connectstrata/strata-frontend-sdk",
   "version": "1.0.0",
   "description": "Frontend utilities for simplifying integration auth",
   "main": "./dist/cjs/index.js",
@@ -23,8 +23,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
-    "prepare": "npm run build",
-    "test:example": "cd examples/react-test && npm install && npm run dev"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
