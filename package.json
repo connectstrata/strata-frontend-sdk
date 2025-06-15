@@ -1,0 +1,49 @@
+{
+  "name": "strata-frontend-sdk",
+  "version": "1.0.0",
+  "description": "Frontend utilities for simplifying integration auth",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "prepare": "npm run build",
+    "test:example": "cd examples/react-test && npm install && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/connectstrata/strata-frontend-sdk.git"
+  },
+  "keywords": [
+    "strata",
+    "oauth",
+    "authentication",
+    "sdk"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/connectstrata/strata-frontend-sdk/issues"
+  },
+  "homepage": "https://github.com/connectstrata/strata-frontend-sdk#readme",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tslib": "^2.0.0"
+  }
+}
