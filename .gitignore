@@ -24,4 +24,7 @@ build/
 .env.*.local
 
 # Coverage directory
-coverage/ 
+coverage/
+
+# Project documentation
+project.md 

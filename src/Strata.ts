@@ -92,7 +92,7 @@ export class StrataError extends Error {
   }
 }
 
-const DefaultConnectApiHost = "https://connect.connectstrata.com/";
+const DefaultConnectApiHost = "https://connect.sandbox.connectstrata.com/";
 const OAuthAuthorizePath = "/oauth/authorize";
 
 /**
