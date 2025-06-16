@@ -80,12 +80,14 @@ export default function Home() {
             >
               {loading === integration.key ? "Connecting..." : "Connect"}
             </button>
-            {success && loading === null && (
-              <div className="text-green-600 text-xs mt-2">{success}</div>
-            )}
           </div>
         ))}
       </div>
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
+          {success}
+        </div>
+      )}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
           {error}

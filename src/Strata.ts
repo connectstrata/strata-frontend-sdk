@@ -37,7 +37,7 @@ class OAuthWindow {
  */
 export type StrataOptions = {
   connectApiHost?: string;
-  debugMode?: boolean;
+  debug?: boolean;
 };
 
 /**
@@ -109,10 +109,10 @@ export default class Strata {
   /**
    * @param {Object} [options] - SDK configuration options
    * @param {string} [options.connectApiHost] - The Strata Connect API host
-   * @param {boolean} [options.debugMode] - Whether to enable debug mode
+   * @param {boolean} [options.debug] - Whether to enable debug mode
    */
   constructor(options: StrataOptions = {}) {
-    this.debug = options.debugMode || false;
+    this.debug = options.debug || false;
 
     try {
       this.connectApiBaseUrl = new URL(
