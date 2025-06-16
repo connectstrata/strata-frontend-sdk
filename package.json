@@ -1,15 +1,13 @@
 {
   "name": "@connectstrata/strata-frontend-sdk",
   "version": "1.0.0",
-  "description": "Frontend utilities for simplifying integration auth",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "description": "Frontend sdk for simplifying integration auth",
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/types/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "files": [
@@ -18,9 +16,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "prepare": "npm run build"
@@ -35,7 +31,7 @@
     "authentication",
     "sdk"
   ],
-  "author": "",
+  "author": "Strata",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/connectstrata/strata-frontend-sdk/issues"
