@@ -19,7 +19,8 @@ const integrations = [
   },
 ];
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID || "demo_project_id";
+const PROJECT_ID =
+  process.env.NEXT_PUBLIC_STRATA_PROJECT_ID || "strata_project_id";
 
 export default function Home() {
   const [loading, setLoading] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export default function Home() {
       <h1 className="text-3xl font-semibold mb-10 text-gray-900">
         Integrations
       </h1>
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-6">
         {integrations.map((integration) => (
           <div
             key={integration.name}
@@ -79,15 +80,17 @@ export default function Home() {
             >
               {loading === integration.key ? "Connecting..." : "Connect"}
             </button>
-            {error && loading === null && (
-              <div className="text-red-600 text-xs mt-2">{error}</div>
-            )}
             {success && loading === null && (
               <div className="text-green-600 text-xs mt-2">{success}</div>
             )}
           </div>
         ))}
       </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+          {error}
+        </div>
+      )}
     </div>
   );
 }
