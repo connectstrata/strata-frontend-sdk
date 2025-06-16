@@ -45,16 +45,6 @@ class OAuthWindow {
 }
 
 /**
- * @interface StrataOptions - Configuration options for the Strata SDK
- */
-export type StrataOptions = {
-  /** The Strata Connect API host URL. Defaults to sandbox environment if not provided */
-  connectApiHost?: string;
-  /** Enables debug logging when set to true */
-  debug?: boolean;
-};
-
-/**
  * @enum StrataErrorCode - Error codes that can be returned by the Strata Connect API
  */
 export enum StrataErrorCode {
@@ -62,8 +52,10 @@ export enum StrataErrorCode {
   AuthorizationFailed = "AuthorizationFailed",
   /** The provided Connect API host URL is invalid */
   InvalidConnectApiHost = "InvalidConnectApiHost",
-  /** Browser blocked the popup window */
+  /** Browser blocked the auth window */
   PopupBlocked = "PopupBlocked",
+  /** The auth window was closed by the user */
+  PopupClosed = "PopupClosed",
   /** User's session has expired. Retrying usually resolves this error. */
   SessionExpired = "SessionExpired",
   /** User's session was not found. Retrying usually resolves this error. */
@@ -123,6 +115,16 @@ const DefaultConnectApiHost = "https://connect.sandbox.connectstrata.com";
 const OAuthAuthorizePath = "/oauth/authorize";
 
 /**
+ * @interface StrataOptions - Configuration options for the Strata SDK
+ */
+export type StrataOptions = {
+  /** The Strata Connect API host URL. Defaults to sandbox environment if not provided */
+  connectApiHost?: string;
+  /** Enables debug logging when set to true */
+  debug?: boolean;
+};
+
+/**
  * @class Strata - The Strata Frontend SDK
  */
 export default class Strata {
@@ -158,18 +160,13 @@ export default class Strata {
    * @param projectId - The Strata project id
    * @param jwtToken - A signed user JWT token
    * @param serviceProviderId - The service provider id
-   * @param options - Optional parameters
-   * @param options.customParams - Additional parameters for the server to use when setting up the connection
-   * @param options.onClose - Callback function when the auth window is closed
+   * @param customParams - Additional parameters for the server to use when setting up the connection
    * @returns Promise that resolves when the OAuth flow completes
-   * @throws {StrataError} If the popup is blocked or authorization fails
+   * @throws {StrataError} If the popup is blocked, the user closes the window, or authorization fails
    * @example
    * ```typescript
    * try {
-   *   await strata.authorize('project-123', 'jwt-token', 'shopify', {
-   *     customParams: { shop: 'my-shop.myshopify.com' },
-   *     onClose: () => console.log('Auth window closed')
-   *   });
+   *   await strata.authorize('project-123', 'jwt-token', 'shopify', customParams: { shop: 'my-shop.myshopify.com' });
    *   console.log('Authorization successful');
    * } catch (error) {
    *   if (error instanceof StrataError) {
@@ -182,14 +179,9 @@ export default class Strata {
     projectId: string,
     jwtToken: string,
     serviceProviderId: string,
-    options?: {
-      customParams?: Record<string, string>;
-      onClose?: () => void;
-    }
+    customParams?: Record<string, string>
   ): Promise<void> {
     this.cleanup();
-
-    const { onClose, customParams } = options ?? {};
 
     // https://www.ryanthomson.net/articles/you-shouldnt-call-window-open-asynchronously/
     // how to avoid browser blocking popup:
@@ -275,8 +267,9 @@ export default class Strata {
           this.logDebug("auth window closed");
           clearInterval(checkPopupClosed);
           this.cleanup();
-          onClose?.();
-          resolve();
+          reject(
+            new StrataError("Authorization failed", StrataErrorCode.PopupClosed)
+          );
         }
       }, 500);
     });

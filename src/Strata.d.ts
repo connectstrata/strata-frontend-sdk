@@ -1,22 +1,9 @@
+import { StrataErrorCode } from "./Strata";
+
 export type StrataOptions = {
   connectApiHost?: string;
   debugMode?: boolean;
 };
-
-export enum StrataErrorCode {
-  AuthorizationFailed = "AuthorizationFailed",
-  InvalidConnectApiHost = "InvalidConnectApiHost",
-  PopupBlocked = "PopupBlocked",
-  SessionExpired = "SessionExpired",
-  SessionNotFound = "SessionNotFound",
-  InvalidProjectId = "InvalidProjectId",
-  InvalidServiceProviderId = "InvalidServiceProviderId",
-  MissingCode = "MissingCode",
-  MissingState = "MissingState",
-  MissingToken = "MissingToken",
-  InvalidToken = "InvalidToken",
-  InternalServerError = "InternalServerError",
-}
 
 export enum OAuthResultStatus {
   Success = "Success",
