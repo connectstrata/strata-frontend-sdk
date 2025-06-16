@@ -3,9 +3,9 @@
  * @internal
  */
 class OAuthWindow {
-  private window: Window | null = null;
+  private window: Window;
 
-  constructor({ window }: { window: Window | null }) {
+  constructor({ window }: { window: Window }) {
     this.window = window;
   }
 
@@ -38,7 +38,7 @@ class OAuthWindow {
    * Closes the popup window if it's open
    */
   public close(): void {
-    if (this.window && !this.window.closed) {
+    if (this.isOpen()) {
       this.window.close();
     }
   }
@@ -119,7 +119,7 @@ export class StrataError extends Error {
   }
 }
 
-const DefaultConnectApiHost = "https://connect.sandbox.connectstrata.com/";
+const DefaultConnectApiHost = "https://connect.sandbox.connectstrata.com";
 const OAuthAuthorizePath = "/oauth/authorize";
 
 /**
@@ -211,9 +211,7 @@ export default class Strata {
       );
     }
 
-    if (this.debug) {
-      console.log("opening authorize url:", authorizeUrl.href);
-    }
+    this.logDebug("opening authorize url:", authorizeUrl.href);
 
     const popup = window.open(
       authorizeUrl.href,
@@ -222,8 +220,9 @@ export default class Strata {
     );
 
     return new Promise((resolve, reject) => {
-      this.oauthWindow = new OAuthWindow({ window: popup });
-      if (!this.oauthWindow.isOpen()) {
+      if (popup && !popup.closed) {
+        this.oauthWindow = new OAuthWindow({ window: popup });
+      } else {
         reject(
           new StrataError(
             "Unable to open auth window",
@@ -240,22 +239,16 @@ export default class Strata {
           return;
         }
 
-        if (this.debug) {
-          console.log("received message from auth window", event);
-        }
+        this.logDebug("received message from auth window", event);
 
         if (this.isOAuthResult(event.data)) {
           const { status, code } = event.data;
           if (status === OAuthResultStatus.Success) {
-            if (this.debug) {
-              console.log("authentication successful");
-            }
+            this.logDebug("authentication successful");
             this.cleanup();
             resolve();
           } else if (status === OAuthResultStatus.Error) {
-            if (this.debug) {
-              console.log("authentication failed");
-            }
+            this.logDebug("authentication failed");
             this.cleanup(false);
             // todo - add a better error message for each code
             reject(
@@ -266,12 +259,10 @@ export default class Strata {
             );
           }
         } else {
-          if (this.debug) {
-            console.log(
-              "received invalid message from auth window",
-              event.data
-            );
-          }
+          this.logDebug(
+            "received invalid message from auth window",
+            event.data
+          );
           this.cleanup(false);
           return;
         }
@@ -281,9 +272,7 @@ export default class Strata {
 
       const checkPopupClosed = setInterval(() => {
         if (!this.oauthWindow || !this.oauthWindow.isOpen()) {
-          if (this.debug) {
-            console.log("auth window closed");
-          }
+          this.logDebug("auth window closed");
           clearInterval(checkPopupClosed);
           this.cleanup();
           onClose?.();
@@ -293,8 +282,15 @@ export default class Strata {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private logDebug(...args: any[]) {
+    if (this.debug) {
+      console.log(...args);
+    }
+  }
+
   /**
-   * Type guard to check if an unknown value is an OAuthResult
+   * Check if an event received by the window listener is an OAuthResult
    * @internal
    */
   private isOAuthResult(data: unknown): data is OAuthResult {
