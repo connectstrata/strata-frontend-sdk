@@ -9,7 +9,6 @@ export enum StrataErrorCode {
   PopupBlocked = "PopupBlocked",
   SessionExpired = "SessionExpired",
   SessionNotFound = "SessionNotFound",
-  MissingProjectId = "MissingProjectId",
   InvalidProjectId = "InvalidProjectId",
   InvalidServiceProviderId = "InvalidServiceProviderId",
   MissingCode = "MissingCode",

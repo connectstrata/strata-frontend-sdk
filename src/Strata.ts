@@ -64,19 +64,17 @@ export enum StrataErrorCode {
   InvalidConnectApiHost = "InvalidConnectApiHost",
   /** Browser blocked the popup window */
   PopupBlocked = "PopupBlocked",
-  /** User's session has expired */
+  /** User's session has expired. Retrying usually resolves this error. */
   SessionExpired = "SessionExpired",
-  /** User's session was not found */
+  /** User's session was not found. Retrying usually resolves this error. */
   SessionNotFound = "SessionNotFound",
-  /** Project ID was not provided in the request */
-  MissingProjectId = "MissingProjectId",
-  /** The provided Project ID is invalid */
+  /** The provided Project ID is invalid or missing */
   InvalidProjectId = "InvalidProjectId",
-  /** The provided Service Provider ID is invalid */
+  /** The provided Service Provider ID is invalid or missing */
   InvalidServiceProviderId = "InvalidServiceProviderId",
-  /** Authorization code is missing from the response */
+  /** Authorization code is missing from the callback URL */
   MissingCode = "MissingCode",
-  /** State parameter is missing from the response */
+  /** State parameter is missing from the callback URL */
   MissingState = "MissingState",
   /** JWT token is missing from the request */
   MissingToken = "MissingToken",
