@@ -1,5 +1,6 @@
 /**
- * A wrapper around a popup window that starts an oauth flow
+ * @class OAuthWindow - A wrapper around a popup window that handles OAuth flow window management
+ * @internal
  */
 class OAuthWindow {
   private window: Window | null = null;
@@ -8,6 +9,12 @@ class OAuthWindow {
     this.window = window;
   }
 
+  /**
+   * Calculates the optimal position and dimensions for the popup window
+   * @param width - Desired width of the popup
+   * @param height - Desired height of the popup
+   * @returns Object containing the calculated position and dimensions
+   */
   static getLayout({ width, height }: { width: number; height: number }): {
     top: number;
     left: number;
@@ -19,10 +26,17 @@ class OAuthWindow {
     return { left, top, width, height };
   }
 
+  /**
+   * Checks if the popup window is currently open
+   * @returns true if the window is open, false otherwise
+   */
   public isOpen(): boolean {
     return !!this.window && !this.window.closed;
   }
 
+  /**
+   * Closes the popup window if it's open
+   */
   public close(): void {
     if (this.window && !this.window.closed) {
       this.window.close();
@@ -31,36 +45,44 @@ class OAuthWindow {
 }
 
 /**
- * @interface StrataOptions - SDK configuration options
- * @param connectApiHost - The Strata Connect API host
- * @param debugMode - Whether to enable debug mode
+ * @interface StrataOptions - Configuration options for the Strata SDK
  */
 export type StrataOptions = {
+  /** The Strata Connect API host URL. Defaults to sandbox environment if not provided */
   connectApiHost?: string;
+  /** Enables debug logging when set to true */
   debug?: boolean;
 };
 
 /**
- * @enum StrataErrorCode - The set of possible error codes returned by the Strata Connect API
+ * @enum StrataErrorCode - Error codes that can be returned by the Strata Connect API
  */
 export enum StrataErrorCode {
-  // fallback if error code isn't recognized
+  /** Fallback error code when the specific error is not recognized */
   AuthorizationFailed = "AuthorizationFailed",
-  // frontend errors
+  /** The provided Connect API host URL is invalid */
   InvalidConnectApiHost = "InvalidConnectApiHost",
+  /** Browser blocked the popup window */
   PopupBlocked = "PopupBlocked",
-  // session errors
+  /** User's session has expired */
   SessionExpired = "SessionExpired",
+  /** User's session was not found */
   SessionNotFound = "SessionNotFound",
-  // invalid request
+  /** Project ID was not provided in the request */
   MissingProjectId = "MissingProjectId",
+  /** The provided Project ID is invalid */
   InvalidProjectId = "InvalidProjectId",
+  /** The provided Service Provider ID is invalid */
   InvalidServiceProviderId = "InvalidServiceProviderId",
+  /** Authorization code is missing from the response */
   MissingCode = "MissingCode",
+  /** State parameter is missing from the response */
   MissingState = "MissingState",
+  /** JWT token is missing from the request */
   MissingToken = "MissingToken",
+  /** The provided JWT token is invalid */
   InvalidToken = "InvalidToken",
-  // dreaded 500 error
+  /** Internal server error occurred */
   InternalServerError = "InternalServerError",
 }
 
@@ -82,10 +104,17 @@ export interface OAuthResult {
 
 /**
  * @class StrataError - Errors thrown by the SDK
+ * @extends Error
  */
 export class StrataError extends Error {
+  /** The specific error code associated with this error */
   code: StrataErrorCode;
 
+  /**
+   * Creates a new StrataError
+   * @param message - Human readable error message
+   * @param code - Specific error code from StrataErrorCode enum
+   */
   constructor(message: string, code: StrataErrorCode) {
     super(message);
     this.code = code;
@@ -96,7 +125,7 @@ const DefaultConnectApiHost = "https://connect.sandbox.connectstrata.com/";
 const OAuthAuthorizePath = "/oauth/authorize";
 
 /**
- * The Strata Frontend SDK
+ * @class Strata - The Strata Frontend SDK
  */
 export default class Strata {
   private connectApiBaseUrl: URL;
@@ -107,9 +136,9 @@ export default class Strata {
   private messageListener: ((event: MessageEvent) => void) | null = null;
 
   /**
-   * @param {Object} [options] - SDK configuration options
-   * @param {string} [options.connectApiHost] - The Strata Connect API host
-   * @param {boolean} [options.debug] - Whether to enable debug mode
+   * Creates a new instance of the Strata SDK
+   * @param options - Configuration options for the SDK
+   * @throws {StrataError} If the connectApiHost is not a valid URL
    */
   constructor(options: StrataOptions = {}) {
     this.debug = options.debug || false;
@@ -128,13 +157,28 @@ export default class Strata {
 
   /**
    * Authorize an integration for a user
-   * @param {string} projectId - The Strata project id
-   * @param {string} jwtToken - A signed user JWT token
-   * @param {string} serviceProviderId - The service provider id
-   * @param {Object} [options] - Optional parameters
-   * @param {Object} [options.customParams] - Custom parameters to add to the OAuth URL
-   * @param {Function} [options.onClose] - Callback when the popup is closed
-   * @returns {Promise<void>} A promise that resolves when the OAuth flow completes
+   * @param projectId - The Strata project id
+   * @param jwtToken - A signed user JWT token
+   * @param serviceProviderId - The service provider id
+   * @param options - Optional parameters
+   * @param options.customParams - Additional parameters for the server to use when setting up the connection
+   * @param options.onClose - Callback function when the auth window is closed
+   * @returns Promise that resolves when the OAuth flow completes
+   * @throws {StrataError} If the popup is blocked or authorization fails
+   * @example
+   * ```typescript
+   * try {
+   *   await strata.authorize('project-123', 'jwt-token', 'shopify', {
+   *     customParams: { shop: 'my-shop.myshopify.com' },
+   *     onClose: () => console.log('Auth window closed')
+   *   });
+   *   console.log('Authorization successful');
+   * } catch (error) {
+   *   if (error instanceof StrataError) {
+   *     console.error(`Authorization failed: ${error.code}`);
+   *   }
+   * }
+   * ```
    */
   public authorize(
     projectId: string,
@@ -251,10 +295,19 @@ export default class Strata {
     });
   }
 
+  /**
+   * Type guard to check if an unknown value is an OAuthResult
+   * @internal
+   */
   private isOAuthResult(data: unknown): data is OAuthResult {
     return typeof data === "object" && data !== null && "status" in data;
   }
 
+  /**
+   * Cleans up resources used by the OAuth flow
+   * @internal
+   * @param closeWindow - Whether to close the popup window
+   */
   private cleanup(closeWindow: boolean = true) {
     closeWindow && this.oauthWindow?.close();
     this.oauthWindow = null;

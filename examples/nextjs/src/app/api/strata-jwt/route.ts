@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 /**
- * Generates a JWT token for Strata integration user auth
+ * Generates a user JWT token for the Strata SDK
  */
 export async function POST() {
   const currentTime = Math.floor(Date.now() / 1000);
