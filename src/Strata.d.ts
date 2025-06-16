@@ -35,10 +35,7 @@ declare class Strata {
     projectId: string,
     jwtToken: string,
     serviceProviderId: string,
-    options?: {
-      customParams?: Record<string, string>;
-      onClose?: () => void;
-    }
+    customParams?: Record<string, string>
   ): Promise<void>;
 }
 

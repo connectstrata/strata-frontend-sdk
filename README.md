@@ -79,8 +79,6 @@ Some integrations require additional parameters. For example, Shopfiy requires t
 
 ```typescript
 strata.authorize(projectId, jwtToken, "shopify", {
-  customParams: {
-    shop: "connectstrata.myshopify.com",
-  },
+  shop: "connectstrata.myshopify.com",
 });
 ```
