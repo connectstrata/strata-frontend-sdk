@@ -1,6 +1,6 @@
 {
   "name": "@connectstrata/strata-frontend-sdk",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Frontend sdk for simplifying integration auth",
   "type": "module",
   "sideEffects": false,
