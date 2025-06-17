@@ -1,14 +1,22 @@
 # strata-frontend-sdk
 
+### Installing from npm
+
+Install the frontend SDK with your favorite package manager:
+
+```bash
+$ npm install @connectstrata/frontend-sdk
+```
+
 ### Setup
 
-#### 1. Generate a signing key in the Strata UI
+#### 1. Generate a signing key in the Strata dashboard
 
-Login to the Strata web app and generate a signing key on the [Settings](https://app.connectstrata.com/settings) page.
+In the Strata dashboard, navigate to the [Settings](https://app.connectstrata.com/settings) page by selecting `Settings` in the sidebar. Click `Generate New Keypair` to get a new signing key. Save the private key somewhere secure. You will not be able to see it again.
 
 #### 2. Create signed user JWT tokens in your app backend
 
-**In your app backend**, generate a user [JWT](https://jwt.io/) token for each user and make it available to the frontend. If your frontend is a client-side javascript application, this likely means creating an API endpoint that the frontend can use to get a user JWT token. Never expose the signing key directly to the frontend.
+**In your app backend**, generate a user [JWT](https://jwt.io/) token for each user and make it available to the frontend. If your frontend is a client-side javascript application, this likely means creating an API endpoint that the frontend can use to fetch a user JWT token. Never expose the signing key directly to the frontend.
 
 The JWT must include the following claims: `sub`, `iat`, `exp`.
 
@@ -55,17 +63,9 @@ export async function POST() {
 }
 ```
 
-#### 3. Install the frontend SDK
+### 3. Prompt a user to authorize your integration
 
-Install the frontend SDK from npm
-
-```
-$ npm install @connectstrata/frontend-sdk
-```
-
-#### 4. Create an SDK instance and prompt a user to authorize an integration
-
-Call `strata.authorize` with a signed user jwt from your backend. The function call returns a `Promise` that resolves when the user successfully completes the auth flow or closes the auth window. It fails with an error if the authorization fails. You can provide an optional `onClose` handler that's executed when the window is closed.
+To start the authorization flow for your integration, call `strata.authorize` with a signed user jwt. The function call returns a `Promise` that resolves when the user successfully completes the auth flow. It fails with an error if the authorization fails or the user closes the window without authorizing your app.
 
 ```typescript
 import Strata from "@strata/frontend-sdk";
@@ -79,6 +79,8 @@ Some integrations require additional parameters. For example, Shopfiy requires t
 
 ```typescript
 strata.authorize(projectId, jwtToken, "shopify", {
-  shop: "connectstrata.myshopify.com",
+  customParams: {
+    shop: "connectstrata.myshopify.com",
+  },
 });
 ```

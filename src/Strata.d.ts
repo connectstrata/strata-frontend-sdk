@@ -5,6 +5,10 @@ export type StrataOptions = {
   debugMode?: boolean;
 };
 
+export interface AuthorizeOptions {
+  customParams?: Record<string, string>;
+}
+
 export enum OAuthResultStatus {
   Success = "Success",
   Error = "Error",
@@ -28,14 +32,14 @@ declare class Strata {
    * @param projectId - The Strata project id
    * @param jwtToken - A signed user JWT token
    * @param serviceProviderId - The service provider id
-   * @param options - Optional parameters
+   * @param options - Optional parameters for the authorization flow
    * @returns A promise that resolves when the OAuth flow completes (success, error, or the user closes the popup)
    */
   authorize(
     projectId: string,
     jwtToken: string,
     serviceProviderId: string,
-    customParams?: Record<string, string>
+    options?: AuthorizeOptions
   ): Promise<void>;
 }
 

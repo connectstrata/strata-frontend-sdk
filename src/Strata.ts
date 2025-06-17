@@ -125,6 +125,14 @@ export type StrataOptions = {
 };
 
 /**
+ * @interface AuthorizeOptions - Options for the authorize method
+ */
+export interface AuthorizeOptions {
+  /** Additional parameters for the server to use when setting up the connection */
+  customParams?: Record<string, string>;
+}
+
+/**
  * @class Strata - The Strata Frontend SDK
  */
 export default class Strata {
@@ -160,13 +168,15 @@ export default class Strata {
    * @param projectId - The Strata project id
    * @param jwtToken - A signed user JWT token
    * @param serviceProviderId - The service provider id
-   * @param customParams - Additional parameters for the server to use when setting up the connection
+   * @param options - Optional parameters for the authorization flow
    * @returns Promise that resolves when the OAuth flow completes
    * @throws {StrataError} If the popup is blocked, the user closes the window, or authorization fails
    * @example
    * ```typescript
    * try {
-   *   await strata.authorize('project-123', 'jwt-token', 'shopify', customParams: { shop: 'my-shop.myshopify.com' });
+   *   await strata.authorize('project-123', 'jwt-token', 'shopify', {
+   *     customParams: { shop: 'my-shop.myshopify.com' }
+   *   });
    *   console.log('Authorization successful');
    * } catch (error) {
    *   if (error instanceof StrataError) {
@@ -179,7 +189,7 @@ export default class Strata {
     projectId: string,
     jwtToken: string,
     serviceProviderId: string,
-    customParams?: Record<string, string>
+    options?: AuthorizeOptions
   ): Promise<void> {
     this.cleanup();
 
@@ -197,8 +207,8 @@ export default class Strata {
     authorizeUrl.searchParams.append("projectId", projectId);
     authorizeUrl.searchParams.append("token", jwtToken);
 
-    if (customParams) {
-      Object.entries(customParams).forEach(([k, v]) =>
+    if (options?.customParams) {
+      Object.entries(options.customParams).forEach(([k, v]) =>
         authorizeUrl.searchParams.append(k, v)
       );
     }
