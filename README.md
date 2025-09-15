@@ -22,9 +22,9 @@ The JWT must include the following claims: `sub`, `iat`, `exp`.
 
 ```json
 {
-    "sub": "user_or_company_id"
-    "iat": 1749602274
-    "exp": 1749602290
+  "sub": "user_or_company_id",
+  "iat": 1749602274,
+  "exp": 1749602290
 }
 ```
 
