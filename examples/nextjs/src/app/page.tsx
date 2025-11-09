@@ -52,7 +52,7 @@ export default function Home() {
         options.customParams = { shop: "connectstrata.myshopify.com" };
       }
 
-      await strata.authorize(PROJECT_ID, data.token, providerId, options);
+      await strata.authorize(PROJECT_ID!, data.token, providerId, options);
       setSuccess(`Connected to ${providerId}`);
     } catch (err: any) {
       setError(err.message || "Error authorizing integration");
