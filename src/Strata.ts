@@ -82,8 +82,8 @@ export enum StrataErrorCode {
  * @enum OAuthResultStatus - The set of possible OAuth result statuses
  */
 export enum OAuthResultStatus {
-  Success,
   Error,
+  Success,
 }
 
 /**
