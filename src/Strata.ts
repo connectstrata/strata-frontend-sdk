@@ -45,7 +45,7 @@ class OAuthWindow {
 }
 
 /**
- * @enum StrataErrorCode - Error codes that can be returned by the Strata Connect API
+ * @enum StrataErrorCode - Error codes that can be returned by the Strata Connect API or the SDK
  */
 export enum StrataErrorCode {
   /** Fallback error code when the specific error is not recognized */
@@ -58,7 +58,9 @@ export enum StrataErrorCode {
   InvalidProjectId,
   /** The provided Service Provider ID is invalid or missing */
   InvalidServiceProviderId,
-  /** The provided Shopify custom parameters are invalid */
+  /** The provided custom parameters are invalid for the service provider's authorization flow
+   * Note - this is an SDK error
+   */
   InvalidAuthParams,
   /** The provided JWT token is invalid */
   InvalidToken,
@@ -213,7 +215,7 @@ export default class Strata {
 
     if (options?.customParams) {
       Object.entries(options.customParams).forEach(([k, v]) =>
-        authorizeUrl.searchParams.append(k, v)
+        authorizeUrl.searchParams.append(k, String(v))
       );
     }
 
@@ -304,7 +306,7 @@ export default class Strata {
 
   private validateShopifyAuthParams(customParams: Record<string, unknown>): void {
     if (!customParams?.shop) {
-      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant's shop subdomain. E.g. 'connectstrata' for the 'connectstrata.myshopify.com' domain", StrataErrorCode.InvalidAuthParams);
+      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant's shop subdomain. For example, 'connectstrata.myshopify.com'", StrataErrorCode.InvalidAuthParams);
     }
   }
 
