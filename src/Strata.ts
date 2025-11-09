@@ -49,41 +49,41 @@ class OAuthWindow {
  */
 export enum StrataErrorCode {
   /** Fallback error code when the specific error is not recognized */
-  AuthorizationFailed = "AuthorizationFailed",
+  AuthorizationFailed,
   /** Internal server error occurred */
-  InternalServerError = "InternalServerError",
+  InternalServerError,
   /** The provided Connect API host URL is invalid */
-  InvalidConnectApiHost = "InvalidConnectApiHost",
+  InvalidConnectApiHost,
   /** The provided Project ID is invalid or missing */
-  InvalidProjectId = "InvalidProjectId",
+  InvalidProjectId,
   /** The provided Service Provider ID is invalid or missing */
-  InvalidServiceProviderId = "InvalidServiceProviderId",
+  InvalidServiceProviderId,
   /** The provided Shopify custom parameters are invalid */
-  InvalidShopifyCustomParams = "InvalidShopifyCustomParams",
+  InvalidAuthParams,
   /** The provided JWT token is invalid */
-  InvalidToken = "InvalidToken",
+  InvalidToken,
   /** Authorization code is missing from the callback URL */
-  MissingCode = "MissingCode",
+  MissingCode,
   /** State parameter is missing from the callback URL */
-  MissingState = "MissingState",
+  MissingState,
   /** JWT token is missing from the request */
-  MissingToken = "MissingToken",
+  MissingToken,
   /** Browser blocked the auth window */
-  PopupBlocked = "PopupBlocked",
+  PopupBlocked,
   /** The auth window was closed by the user */
-  PopupClosed = "PopupClosed",
+  PopupClosed,
   /** User's session has expired. Retrying usually resolves this error. */
-  SessionExpired = "SessionExpired",
+  SessionExpired,
   /** User's session was not found. Retrying usually resolves this error. */
-  SessionNotFound = "SessionNotFound",
+  SessionNotFound,
 }
 
 /**
  * @enum OAuthResultStatus - The set of possible OAuth result statuses
  */
 export enum OAuthResultStatus {
-  Success = "Success",
-  Error = "Error",
+  Success,
+  Error,
 }
 
 /**
@@ -304,7 +304,7 @@ export default class Strata {
 
   private validateShopifyAuthParams(customParams: Record<string, unknown>): void {
     if (!customParams?.shop) {
-      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant's shop subdomain. E.g. 'connectstrata' for the 'connectstrata.myshopify.com' domain", StrataErrorCode.InvalidShopifyCustomParams);
+      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant's shop subdomain. E.g. 'connectstrata' for the 'connectstrata.myshopify.com' domain", StrataErrorCode.InvalidAuthParams);
     }
   }
 
