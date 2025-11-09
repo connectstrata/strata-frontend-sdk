@@ -82,8 +82,8 @@ export enum StrataErrorCode {
  * @enum OAuthResultStatus - The set of possible OAuth result statuses
  */
 export enum OAuthResultStatus {
-  Success = "Success",
   Error = "Error",
+  Success = "Success",
 }
 
 /**
@@ -304,7 +304,7 @@ export default class Strata {
 
   private validateShopifyAuthParams(customParams: Record<string, unknown>): void {
     if (!customParams?.shop) {
-      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant's shop subdomain. E.g. 'connectstrata' for the 'connectstrata.myshopify.com' domain", StrataErrorCode.InvalidShopifyCustomParams);
+      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant shop's domain. For example: 'connectstrata.myshopify.com'", StrataErrorCode.InvalidAuthParams);
     }
   }
 
