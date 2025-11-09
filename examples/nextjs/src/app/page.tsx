@@ -3,32 +3,40 @@ import Image from "next/image";
 import { useState } from "react";
 import Strata from "@connectstrata/strata-frontend-sdk";
 
-const integrations = [
+const providers = [
   {
     name: "Slack",
     description: "Connect Slack to receive notifications",
     icon: "/slack-new-logo.svg",
-    key: "slack",
+    id: "slack",
   },
   {
     name: "Salesforce",
     description:
       "Sync leads, contacts, and campaign data directly with your Salesforce CRM.",
     icon: "/salesforce-2.svg",
-    key: "salesforce",
+    id: "salesforce",
+  },
+  {
+    name: "Shopify",
+    description: "Sync orders, customers, and product data from your Shopify store.",
+    icon: "/shopify.svg",
+    id: "shopify",
   },
 ];
 
-const PROJECT_ID =
-  process.env.NEXT_PUBLIC_STRATA_PROJECT_ID || "strata_project_id";
+const PROJECT_ID = process.env.NEXT_PUBLIC_STRATA_PROJECT_ID;
+if (!PROJECT_ID) {
+  throw new Error("NEXT_PUBLIC_STRATA_PROJECT_ID is not set");
+}
 
 export default function Home() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  async function handleConnect(integrationKey: string) {
-    setLoading(integrationKey);
+  async function handleConnect(providerId: string) {
+    setLoading(providerId);
     setError(null);
     setSuccess(null);
     try {
@@ -37,8 +45,15 @@ export default function Home() {
       if (!data.token) throw new Error("No token returned from API");
 
       const strata = new Strata();
-      await strata.authorize(PROJECT_ID, data.token, integrationKey);
-      setSuccess(`Connected to ${integrationKey}`);
+
+      // Add custom parameters for specific integrations
+      const options: { customParams?: Record<string, string> } = {};
+      if (providerId === "shopify") {
+        options.customParams = { shop: "connectstrata.myshopify.com" };
+      }
+
+      await strata.authorize(PROJECT_ID, data.token, providerId, options);
+      setSuccess(`Connected to ${providerId}`);
     } catch (err: any) {
       setError(err.message || "Error authorizing integration");
     } finally {
@@ -52,7 +67,7 @@ export default function Home() {
         Integrations
       </h1>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-6">
-        {integrations.map((integration) => (
+        {providers.map((integration) => (
           <div
             key={integration.name}
             className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-between min-h-[180px] hover:shadow-md transition-shadow"
@@ -75,10 +90,10 @@ export default function Home() {
             <button
               className="ml-auto px-4 py-1.5 text-sm font-medium rounded bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-60"
               type="button"
-              disabled={loading === integration.key}
-              onClick={() => handleConnect(integration.key)}
+              disabled={loading === integration.id}
+              onClick={() => handleConnect(integration.id)}
             >
-              {loading === integration.key ? "Connecting..." : "Connect"}
+              {loading === integration.id ? "Connecting..." : "Connect"}
             </button>
           </div>
         ))}
