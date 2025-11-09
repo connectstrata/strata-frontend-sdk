@@ -304,7 +304,7 @@ export default class Strata {
 
   private validateShopifyAuthParams(customParams: Record<string, unknown>): void {
     if (!customParams?.shop) {
-      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant shop's domain. For example: 'connectstrata.myshopify.com'", StrataErrorCode.InvalidAuthParams);
+      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant shop domain. For example: 'connectstrata.myshopify.com'", StrataErrorCode.InvalidAuthParams);
     }
   }
 
