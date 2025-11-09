@@ -50,8 +50,24 @@ class OAuthWindow {
 export enum StrataErrorCode {
   /** Fallback error code when the specific error is not recognized */
   AuthorizationFailed = "AuthorizationFailed",
+  /** Internal server error occurred */
+  InternalServerError = "InternalServerError",
   /** The provided Connect API host URL is invalid */
   InvalidConnectApiHost = "InvalidConnectApiHost",
+  /** The provided Project ID is invalid or missing */
+  InvalidProjectId = "InvalidProjectId",
+  /** The provided Service Provider ID is invalid or missing */
+  InvalidServiceProviderId = "InvalidServiceProviderId",
+  /** The provided Shopify custom parameters are invalid */
+  InvalidShopifyCustomParams = "InvalidShopifyCustomParams",
+  /** The provided JWT token is invalid */
+  InvalidToken = "InvalidToken",
+  /** Authorization code is missing from the callback URL */
+  MissingCode = "MissingCode",
+  /** State parameter is missing from the callback URL */
+  MissingState = "MissingState",
+  /** JWT token is missing from the request */
+  MissingToken = "MissingToken",
   /** Browser blocked the auth window */
   PopupBlocked = "PopupBlocked",
   /** The auth window was closed by the user */
@@ -60,20 +76,6 @@ export enum StrataErrorCode {
   SessionExpired = "SessionExpired",
   /** User's session was not found. Retrying usually resolves this error. */
   SessionNotFound = "SessionNotFound",
-  /** The provided Project ID is invalid or missing */
-  InvalidProjectId = "InvalidProjectId",
-  /** The provided Service Provider ID is invalid or missing */
-  InvalidServiceProviderId = "InvalidServiceProviderId",
-  /** Authorization code is missing from the callback URL */
-  MissingCode = "MissingCode",
-  /** State parameter is missing from the callback URL */
-  MissingState = "MissingState",
-  /** JWT token is missing from the request */
-  MissingToken = "MissingToken",
-  /** The provided JWT token is invalid */
-  InvalidToken = "InvalidToken",
-  /** Internal server error occurred */
-  InternalServerError = "InternalServerError",
 }
 
 /**
@@ -129,7 +131,7 @@ export type StrataOptions = {
  */
 export interface AuthorizeOptions {
   /** Additional parameters for the server to use when setting up the connection */
-  customParams?: Record<string, string>;
+  customParams?: Record<string, unknown>;
 }
 
 /**
@@ -192,6 +194,8 @@ export default class Strata {
     options?: AuthorizeOptions
   ): Promise<void> {
     this.cleanup();
+
+    this.validateAuthParams(serviceProviderId, options?.customParams || {});
 
     // https://www.ryanthomson.net/articles/you-shouldnt-call-window-open-asynchronously/
     // how to avoid browser blocking popup:
@@ -289,6 +293,18 @@ export default class Strata {
   private logDebug(...args: any[]) {
     if (this.debug) {
       console.log(...args);
+    }
+  }
+
+  private validateAuthParams(serviceProviderId: string, customParams: Record<string, unknown>): void {
+    if (serviceProviderId === "shopify") {
+      this.validateShopifyAuthParams(customParams);
+    }
+  }
+
+  private validateShopifyAuthParams(customParams: Record<string, unknown>): void {
+    if (!customParams?.shop) {
+      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant's shop subdomain. E.g. 'connectstrata' for the 'connectstrata.myshopify.com' domain", StrataErrorCode.InvalidShopifyCustomParams);
     }
   }
 
