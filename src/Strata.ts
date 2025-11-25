@@ -52,24 +52,44 @@ class OAuthWindow {
 export enum ConnectApiErrorCode {
   /** Fallback error code when the specific error is not recognized */
   AuthorizationFailed = "AuthorizationFailed",
+  /** The JWT token has expired and is no longer valid */
+  ExpiredToken = "ExpiredToken",
   /** Internal server error occurred */
   InternalServerError = "InternalServerError",
   /** The provided Project ID is invalid or missing */
   InvalidProjectId = "InvalidProjectId",
   /** The provided Service Provider ID is invalid or missing */
   InvalidServiceProviderId = "InvalidServiceProviderId",
-  /** The provided JWT token is invalid */
+  /** The JWT signature verification failed */
+  InvalidSignature = "InvalidSignature",
+  /** The provided JWT token is invalid. This is a fallback for JWT related errors, ideally a more specific error code should be returned. */
   InvalidToken = "InvalidToken",
+  /** Error occurred while fetching or processing JSON Web Keys */
+  JwkError = "JwkError",
+  /** The JWT token is malformed and cannot be parsed */
+  MalformedToken = "MalformedToken",
+  /** Authentication credentials are missing from the request */
+  MissingAuth = "MissingAuth",
+  /** Required claim is missing from the JWT token */
+  MissingClaim = "MissingClaim",
   /** Authorization code is missing from the callback URL */
   MissingCode = "MissingCode",
+  /** JWT token is missing the expiration claim */
+  MissingExpiration = "MissingExpiration",
   /** State parameter is missing from the callback URL */
   MissingState = "MissingState",
   /** JWT token is missing from the request */
   MissingToken = "MissingToken",
+  /** No signing keys available to verify the JWT signature */
+  NoSigningKeys = "NoSigningKeys",
+  /** The JWT token is not yet valid (nbf claim is in the future) */
+  NotYetValid = "NotYetValid",
   /** User's session has expired. Retrying usually resolves this error. */
   SessionExpired = "SessionExpired",
   /** User's session was not found. Retrying usually resolves this error. */
   SessionNotFound = "SessionNotFound",
+  /** The JWT signing algorithm does not match the expected algorithm */
+  WrongAlgorithm = "WrongAlgorithm",
 }
 
 /**
