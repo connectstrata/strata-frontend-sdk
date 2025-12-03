@@ -18,10 +18,26 @@ In the Strata dashboard, navigate to the [Settings](https://app.connectstrata.co
 
 **In your app backend**, generate a user [JWT](https://jwt.io/) token for each user and make it available to the frontend. If your frontend is a client-side javascript application, this likely means creating an API endpoint that the frontend can use to fetch a user JWT token. Never expose the signing key directly to the frontend.
 
-The JWT must include the following claims: `sub`, `iat`, `exp`.
+Use the following JWT header claims:
+- alg: The algorithm used to sign the JWT. Must be `RS256`.
+- typ: The type of token. Must be `JWT`.
 
 ```json
 {
+  "alg": "RS256",
+  "typ": "JWT"
+}
+```
+
+Use the following JWT payload claims `sub`, `iat`, `exp`, `project_id`.
+- project_id: Your Strata project ID. This can be found on the [Settings](https://app.connectstrata.com/settings) page
+- sub: The JWT subject. This is your primary identifier for the user.
+- iat: The JWT issued at timestamp in seconds since the Unix epoch. Typically the current time.
+- exp: The JWT expiration timestamp in seconds since the Unix epoch (must be later than the iat claim).
+
+```json
+{
+  "project_id": "your_project_id",
   "sub": "user_or_company_id",
   "iat": 1749602274,
   "exp": 1749602290
@@ -45,6 +61,7 @@ dotenv.config();
 export async function POST() {
   const currentTime = Math.floor(Date.now() / 1000);
   const payload: jwt.JwtPayload = {
+    project_id: process.env.NEXT_PUBLIC_STRATA_PROJECT_ID,
     sub: "my_user_id",
     iat: currentTime,
   };
@@ -72,13 +89,13 @@ import Strata from "@strata/frontend-sdk";
 
 const strata = new Strata();
 
-strata.authorize(projectId, jwtToken, "slack");
+strata.authorize(jwtToken, "slack");
 ```
 
 Some integrations require additional parameters. For example, Shopfiy requires the merchant's shop subdomain. You can provide additional custom parameters to the authorize call:
 
 ```typescript
-strata.authorize(projectId, jwtToken, "shopify", {
+strata.authorize(jwtToken, "shopify", {
   customParams: {
     shop: "connectstrata.myshopify.com",
   },

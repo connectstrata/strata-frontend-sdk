@@ -25,11 +25,6 @@ const providers = [
   },
 ];
 
-const PROJECT_ID = process.env.NEXT_PUBLIC_STRATA_PROJECT_ID;
-if (!PROJECT_ID) {
-  throw new Error("NEXT_PUBLIC_STRATA_PROJECT_ID is not set");
-}
-
 export default function Home() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +47,7 @@ export default function Home() {
         options.customParams = { shop: "connectstrata.myshopify.com" };
       }
 
-      await strata.authorize(PROJECT_ID!, data.token, providerId, options);
+      await strata.authorize(data.token, providerId, options);
       setSuccess(`Connected to ${providerId}`);
     } catch (err: any) {
       setError(err.message || "Error authorizing integration");

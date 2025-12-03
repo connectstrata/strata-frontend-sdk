@@ -8,6 +8,7 @@ export async function POST() {
   const currentTime = Math.floor(Date.now() / 1000);
   const payload: jwt.JwtPayload = {
     sub: "my_user_id",
+    project_id: process.env.NEXT_PUBLIC_STRATA_PROJECT_ID,
     iat: currentTime,
   };
 
