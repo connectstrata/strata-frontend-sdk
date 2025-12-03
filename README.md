@@ -61,7 +61,7 @@ dotenv.config();
 export async function POST() {
   const currentTime = Math.floor(Date.now() / 1000);
   const payload: jwt.JwtPayload = {
-    project_id: process.env.NEXT_PUBLIC_STRATA_PROJECT_ID,
+    project_id: process.env.STRATA_PROJECT_ID,
     sub: "my_user_id",
     iat: currentTime,
   };
