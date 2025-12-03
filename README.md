@@ -5,7 +5,7 @@
 Install the frontend SDK with your favorite package manager:
 
 ```bash
-$ npm install @connectstrata/frontend-sdk
+$ npm install @connectstrata/strata-frontend-sdk
 ```
 
 ### Setup
@@ -79,7 +79,7 @@ export async function POST() {
 To start the authorization flow for your integration, call `strata.authorize` with a signed user jwt. The function call returns a `Promise` that resolves when the user successfully completes the auth flow. It fails with an error if the authorization fails or the user closes the window without authorizing your app.
 
 ```typescript
-import Strata from "@strata/frontend-sdk";
+import Strata from "@connectstrata/strata-frontend-sdk";
 
 const strata = new Strata();
 
