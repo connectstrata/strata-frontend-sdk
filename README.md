@@ -51,26 +51,20 @@ Here is a sample implementation with a Next.js API endpoint:
 ```typescript
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-/**
- * Generates a JWT token for Strata integration user auth
+/*
+ * Generates a user JWT token for the Strata SDK
  */
 export async function POST() {
+  const projectId = process.env.STRATA_PROJECT_ID;
   const currentTime = Math.floor(Date.now() / 1000);
   const payload: jwt.JwtPayload = {
+    sub: "user_or_company_id",
     project_id: process.env.STRATA_PROJECT_ID,
-    sub: "my_user_id",
     iat: currentTime,
   };
 
   const privateKey = process.env.PRIVATE_KEY;
-  if (!privateKey) {
-    throw new Error("PRIVATE_KEY is not set");
-  }
-
   const token = jwt.sign(payload, privateKey, {
     algorithm: "RS256",
     expiresIn: "1h",
