@@ -200,7 +200,6 @@ export default class Strata {
 
   /**
    * Authorize an integration for a user
-   * @param projectId - The Strata project id
    * @param jwtToken - A signed user JWT token
    * @param serviceProviderId - The service provider id
    * @param options - Optional parameters for the authorization flow
@@ -209,7 +208,7 @@ export default class Strata {
    * @example
    * ```typescript
    * try {
-   *   await strata.authorize('project-123', 'jwt-token', 'shopify', {
+   *   await strata.authorize('jwt-token', 'shopify', {
    *     customParams: { shop: 'my-shop.myshopify.com' }
    *   });
    *   console.log('Authorization successful');
@@ -221,7 +220,6 @@ export default class Strata {
    * ```
    */
   public authorize(
-    projectId: string,
     jwtToken: string,
     serviceProviderId: string,
     options?: AuthorizeOptions
@@ -241,7 +239,6 @@ export default class Strata {
 
     const authorizeUrl = new URL(OAuthAuthorizePath, this.connectApiBaseUrl);
     authorizeUrl.searchParams.append("serviceProviderId", serviceProviderId);
-    authorizeUrl.searchParams.append("projectId", projectId);
     authorizeUrl.searchParams.append("token", jwtToken);
 
     if (options?.customParams) {
