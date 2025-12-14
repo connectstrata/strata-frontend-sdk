@@ -46,8 +46,6 @@ class OAuthWindow {
 
 /**
  * @enum ConnectApiErrorCode - Error codes returned by the Connect API
- *
- * NOTE - THESE NEED TO EXACTLY MATCH THE ERROR CODES RETURNED BY THE SERVER
  */
 export enum ConnectApiErrorCode {
   /** Fallback error code when the specific error is not recognized */
