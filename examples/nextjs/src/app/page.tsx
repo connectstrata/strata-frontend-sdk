@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import Strata from "@connectstrata/strata-frontend-sdk";
+import { AuthorizeOptions } from "../../../../dist/Strata";
 
 const providers = [
   {
@@ -42,9 +43,10 @@ export default function Home() {
       const strata = new Strata();
 
       // Add custom parameters for specific integrations
-      const options: { customParams?: Record<string, string> } = {};
+      const options: AuthorizeOptions = {};
       if (providerId === "shopify") {
         options.customParams = { shop: "connectstrata.myshopify.com" };
+        options.detectClosedAuthWindow = false;
       }
 
       await strata.authorize(data.token, providerId, options);
