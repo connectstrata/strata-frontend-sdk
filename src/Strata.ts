@@ -169,7 +169,12 @@ export type StrataOptions = {
 export interface AuthorizeOptions {
   /** Additional parameters for the server to use when setting up the connection */
   customParams?: Record<string, unknown>;
-  /** Detect if the user closes the auth window. Detection will not work for providers that set the `Cross-Origin-Opener-Policy` header to `same-origin`. Strata has pre-emptively disabled detection for providers that are known to use a strict COOP value.
+  /** 
+   * Detect if the user closes the auth window.
+   * 
+   * Detection will not work for providers that set the `Cross-Origin-Opener-Policy` header
+   * to `same-origin`. Strata has pre-emptively disabled detection for providers that
+   * are known to use a strict COOP value.
    * @default true
    */
   detectClosedAuthWindow?: boolean;

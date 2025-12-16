@@ -46,7 +46,6 @@ export default function Home() {
       const options: AuthorizeOptions = {};
       if (providerId === "shopify") {
         options.customParams = { shop: "connectstrata.myshopify.com" };
-        options.detectClosedAuthWindow = false;
       }
 
       await strata.authorize(data.token, providerId, options);
