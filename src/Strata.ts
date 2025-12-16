@@ -206,7 +206,7 @@ export default class Strata {
       this.connectApiBaseUrl = new URL(
         options.connectApiHost || DefaultConnectApiHost,
       );
-    } catch (error) {
+    } catch {
       throw new StrataError(
         "The connectApiHost provided is not a valid URL",
         SdkErrorCode.InvalidConnectApiHost,
@@ -396,7 +396,10 @@ export default class Strata {
    * @param closeWindow - Whether to close the popup window
    */
   private cleanup(closeWindow: boolean = true) {
-    closeWindow && this.oauthWindow?.close();
+    if (closeWindow) {
+      this.oauthWindow?.close();
+    }
+
     this.oauthWindow = null;
 
     if (this.messageListener) {
