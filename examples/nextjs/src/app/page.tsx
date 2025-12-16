@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import Strata from "@connectstrata/strata-frontend-sdk";
+import Strata, { StrataError } from "@connectstrata/strata-frontend-sdk";
 
 const providers = [
   {
@@ -47,10 +47,14 @@ export default function Home() {
         options.customParams = { shop: "connectstrata.myshopify.com" };
       }
 
-      await strata.authorize(data.token, providerId, options);
-      setSuccess(`Connected to ${providerId}`);
+      const connectionId = await strata.authorize(data.token, providerId, options);
+      setSuccess(`Authorized ${providerId} connection: ${connectionId}`);
     } catch (err: any) {
-      setError(err.message || "Error authorizing integration");
+      if (err instanceof StrataError) {
+        setError(`Error authorizing integration: ${err.code}`);
+      } else {
+        setError("Error authorizing integration: Unknown error code");
+      }
     } finally {
       setLoading(null);
     }

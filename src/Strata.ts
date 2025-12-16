@@ -46,8 +46,6 @@ class OAuthWindow {
 
 /**
  * @enum ConnectApiErrorCode - Error codes returned by the Connect API
- *
- * NOTE - THESE NEED TO EXACTLY MATCH THE ERROR CODES RETURNED BY THE SERVER
  */
 export enum ConnectApiErrorCode {
   /** Fallback error code when the specific error is not recognized */
@@ -112,20 +110,25 @@ export enum SdkErrorCode {
 export type StrataErrorCode = ConnectApiErrorCode | SdkErrorCode;
 
 /**
- * @enum OAuthResultStatus - The set of possible OAuth result statuses
+ * @interface OAuthResultSuccess - Successful authorization result containing the connection ID
  */
-export enum OAuthResultStatus {
-  Error = "Error",
-  Success = "Success",
+interface OAuthResultSuccess {
+  status: "Success";
+  connectionId: string;
 }
 
 /**
- * @interface OAuthResult - The result of a user attempting to authorize via oauth
+ * @interface OAuthResultError - Failed authorization result containing an error code
  */
-export interface OAuthResult {
-  status: OAuthResultStatus;
-  code?: StrataErrorCode;
+interface OAuthResultError {
+  status: "Error";
+  code: StrataErrorCode;
 }
+
+/**
+ * @type OAuthResult - Discriminated union of authorization results
+ */
+type OAuthResult = OAuthResultSuccess | OAuthResultError;
 
 /**
  * @class StrataError - Errors thrown by the SDK
@@ -223,7 +226,7 @@ export default class Strata {
     jwtToken: string,
     serviceProviderId: string,
     options?: AuthorizeOptions
-  ): Promise<void> {
+  ): Promise<string> {
     this.cleanup();
 
     this.validateAuthParams(serviceProviderId, options?.customParams || {});
@@ -277,31 +280,22 @@ export default class Strata {
 
         this.logDebug("received message from auth window", event);
 
-        if (this.isOAuthResult(event.data)) {
-          const { status, code } = event.data;
-          if (status === OAuthResultStatus.Success) {
-            this.logDebug("authentication successful");
-            this.cleanup();
-            resolve();
-          } else if (status === OAuthResultStatus.Error) {
-            this.logDebug("authentication failed");
-            this.cleanup(false);
-            // todo - add a better error message for each code
-            reject(
-              new StrataError(
-                "Authorization failed",
-                code || ConnectApiErrorCode.AuthorizationFailed
-              )
-            );
-          }
-        } else {
-          this.logDebug(
-            "received invalid message from auth window",
-            event.data
-          );
+        if (!this.isOAuthResult(event.data)) {
+          this.logDebug("received invalid message from auth window", event.data);
           this.cleanup(false);
           return;
         }
+
+        if (event.data.status === "Success") {
+          this.logDebug("authentication successful");
+          this.cleanup();
+          resolve(event.data.connectionId);
+          return;
+        }
+
+        this.logDebug("authentication failed");
+        this.cleanup(false);
+        reject(new StrataError("Authorization failed", event.data.code));
       };
 
       window.addEventListener("message", this.messageListener);
@@ -343,7 +337,17 @@ export default class Strata {
    * @internal
    */
   private isOAuthResult(data: unknown): data is OAuthResult {
-    return typeof data === "object" && data !== null && "status" in data;
+    if (typeof data !== "object" || data === null || !("status" in data)) {
+      return false;
+    }
+    const obj = data as Record<string, unknown>;
+    if (obj.status === "Success") {
+      return typeof obj.connectionId === "string";
+    }
+    if (obj.status === "Error") {
+      return typeof obj.code === "string";
+    }
+    return false;
   }
 
   /**
