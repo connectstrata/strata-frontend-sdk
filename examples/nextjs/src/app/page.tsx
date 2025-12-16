@@ -52,7 +52,7 @@ export default function Home() {
       await strata.authorize(data.token, providerId, options);
       setSuccess(`Connected to ${providerId}`);
     } catch (err: any) {
-      setError(err.message || "Error authorizing integration");
+      setError(`${err.message}: ${err.code}` || "Error authorizing integration");
     } finally {
       setLoading(null);
     }
