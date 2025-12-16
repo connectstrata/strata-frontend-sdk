@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import Strata, { StrataError } from "@connectstrata/strata-frontend-sdk";
+import Strata, { StrataError, AuthorizeOptions } from "@connectstrata/strata-frontend-sdk";
 
 const providers = [
   {
@@ -42,7 +42,7 @@ export default function Home() {
       const strata = new Strata();
 
       // Add custom parameters for specific integrations
-      const options: { customParams?: Record<string, string> } = {};
+      const options: AuthorizeOptions = {};
       if (providerId === "shopify") {
         options.customParams = { shop: "connectstrata.myshopify.com" };
       }

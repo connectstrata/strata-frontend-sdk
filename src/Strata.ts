@@ -98,10 +98,12 @@ export enum SdkErrorCode {
   InvalidConnectApiHost = "InvalidConnectApiHost",
   /** The provided authentication parameters are invalid */
   InvalidAuthParams = "InvalidAuthParams",
-  /** Browser blocked the auth window */
+  /** The browser blocked the auth window */
   PopupBlocked = "PopupBlocked",
-  /** The auth window was closed by the user */
+  /** The user closed the auth window before completing the flow */
   PopupClosed = "PopupClosed",
+  /** The user did not complete the auth flow within the timeout period */
+  AuthFlowTimeout = "AuthFlowTimeout",
 }
 
 /**
@@ -151,6 +153,8 @@ export class StrataError extends Error {
 
 const DefaultConnectApiHost = "https://connect.connectstrata.com";
 const OAuthAuthorizePath = "/oauth/authorize";
+const OAuthTimeoutMs = 600000; // 10 minutes
+const DetectClosedAuthWindowDisabledProviders = ["shopify"];
 
 /**
  * @interface StrataOptions - Configuration options for the Strata SDK
@@ -168,6 +172,15 @@ export type StrataOptions = {
 export interface AuthorizeOptions {
   /** Additional parameters for the server to use when setting up the connection */
   customParams?: Record<string, unknown>;
+  /** 
+   * Detect if the user closes the auth window.
+   * 
+   * Detection will not work for providers that set the `Cross-Origin-Opener-Policy` header
+   * to `same-origin`. Strata has pre-emptively disabled detection for providers that
+   * are known to use a strict COOP value.
+   * @default true
+   */
+  detectClosedAuthWindow?: boolean;
 }
 
 /**
@@ -300,16 +313,25 @@ export default class Strata {
 
       window.addEventListener("message", this.messageListener);
 
-      const checkPopupClosed = setInterval(() => {
-        if (!this.oauthWindow || !this.oauthWindow.isOpen()) {
-          this.logDebug("auth window closed");
-          clearInterval(checkPopupClosed);
-          this.cleanup();
-          reject(
-            new StrataError("Authorization failed", SdkErrorCode.PopupClosed)
-          );
-        }
-      }, 500);
+      const detectClosed = options?.detectClosedAuthWindow ?? !DetectClosedAuthWindowDisabledProviders.includes(serviceProviderId);
+      if (detectClosed) {
+        const checkPopupClosed = setInterval(() => {
+          if (!this.oauthWindow || !this.oauthWindow.isOpen()) {
+            this.logDebug("auth window closed");
+            clearInterval(checkPopupClosed);
+            this.cleanup();
+            reject(
+              new StrataError("Authorization failed", SdkErrorCode.PopupClosed)
+            );
+          }
+        }, 500);
+      }
+
+      setTimeout(() => {
+        this.logDebug("authorization timed out");
+        this.cleanup();
+        reject(new StrataError("Authorization timed out", SdkErrorCode.AuthFlowTimeout));
+      }, OAuthTimeoutMs);
     });
   }
 
