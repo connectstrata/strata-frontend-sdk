@@ -19,6 +19,7 @@ In the Strata dashboard, navigate to the [Settings](https://app.connectstrata.co
 **In your app backend**, generate a user [JWT](https://jwt.io/) token for each user and make it available to the frontend. If your frontend is a client-side javascript application, this likely means creating an API endpoint that the frontend can use to fetch a user JWT token. Never expose the signing key directly to the frontend.
 
 Use the following JWT header claims:
+
 - alg: The algorithm used to sign the JWT. Must be `RS256`.
 - typ: The type of token. Must be `JWT`.
 
@@ -30,6 +31,7 @@ Use the following JWT header claims:
 ```
 
 Use the following JWT payload claims `sub`, `iat`, `exp`, `project_id`.
+
 - project_id: Your Strata project ID. This can be found on the [Settings](https://app.connectstrata.com/settings) page
 - sub: The JWT subject. This is your primary identifier for the user.
 - iat: The JWT issued at timestamp in seconds since the Unix epoch. Typically the current time.

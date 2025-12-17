@@ -172,9 +172,9 @@ export type StrataOptions = {
 export interface AuthorizeOptions {
   /** Additional parameters for the server to use when setting up the connection */
   customParams?: Record<string, unknown>;
-  /** 
+  /**
    * Detect if the user closes the auth window.
-   * 
+   *
    * Detection will not work for providers that set the `Cross-Origin-Opener-Policy` header
    * to `same-origin`. Strata has pre-emptively disabled detection for providers that
    * are known to use a strict COOP value.
@@ -204,12 +204,12 @@ export default class Strata {
 
     try {
       this.connectApiBaseUrl = new URL(
-        options.connectApiHost || DefaultConnectApiHost
+        options.connectApiHost || DefaultConnectApiHost,
       );
-    } catch (error) {
+    } catch {
       throw new StrataError(
         "The connectApiHost provided is not a valid URL",
-        SdkErrorCode.InvalidConnectApiHost
+        SdkErrorCode.InvalidConnectApiHost,
       );
     }
   }
@@ -238,7 +238,7 @@ export default class Strata {
   public authorize(
     jwtToken: string,
     serviceProviderId: string,
-    options?: AuthorizeOptions
+    options?: AuthorizeOptions,
   ): Promise<string> {
     this.cleanup();
 
@@ -259,7 +259,7 @@ export default class Strata {
 
     if (options?.customParams) {
       Object.entries(options.customParams).forEach(([k, v]) =>
-        authorizeUrl.searchParams.append(k, String(v))
+        authorizeUrl.searchParams.append(k, String(v)),
       );
     }
 
@@ -268,7 +268,7 @@ export default class Strata {
     const popup = window.open(
       authorizeUrl.href,
       "_blank",
-      `width=${layout.width},height=${layout.height},left=${layout.left},top=${layout.top}`
+      `width=${layout.width},height=${layout.height},left=${layout.left},top=${layout.top}`,
     );
 
     return new Promise((resolve, reject) => {
@@ -278,8 +278,8 @@ export default class Strata {
         reject(
           new StrataError(
             "Unable to open auth window",
-            SdkErrorCode.PopupBlocked
-          )
+            SdkErrorCode.PopupBlocked,
+          ),
         );
       }
 
@@ -294,7 +294,10 @@ export default class Strata {
         this.logDebug("received message from auth window", event);
 
         if (!this.isOAuthResult(event.data)) {
-          this.logDebug("received invalid message from auth window", event.data);
+          this.logDebug(
+            "received invalid message from auth window",
+            event.data,
+          );
           this.cleanup(false);
           return;
         }
@@ -313,7 +316,9 @@ export default class Strata {
 
       window.addEventListener("message", this.messageListener);
 
-      const detectClosed = options?.detectClosedAuthWindow ?? !DetectClosedAuthWindowDisabledProviders.includes(serviceProviderId);
+      const detectClosed =
+        options?.detectClosedAuthWindow ??
+        !DetectClosedAuthWindowDisabledProviders.includes(serviceProviderId);
       if (detectClosed) {
         const checkPopupClosed = setInterval(() => {
           if (!this.oauthWindow || !this.oauthWindow.isOpen()) {
@@ -321,7 +326,7 @@ export default class Strata {
             clearInterval(checkPopupClosed);
             this.cleanup();
             reject(
-              new StrataError("Authorization failed", SdkErrorCode.PopupClosed)
+              new StrataError("Authorization failed", SdkErrorCode.PopupClosed),
             );
           }
         }, 500);
@@ -330,7 +335,12 @@ export default class Strata {
       setTimeout(() => {
         this.logDebug("authorization timed out");
         this.cleanup();
-        reject(new StrataError("Authorization timed out", SdkErrorCode.AuthFlowTimeout));
+        reject(
+          new StrataError(
+            "Authorization timed out",
+            SdkErrorCode.AuthFlowTimeout,
+          ),
+        );
       }, OAuthTimeoutMs);
     });
   }
@@ -342,15 +352,23 @@ export default class Strata {
     }
   }
 
-  private validateAuthParams(serviceProviderId: string, customParams: Record<string, unknown>): void {
+  private validateAuthParams(
+    serviceProviderId: string,
+    customParams: Record<string, unknown>,
+  ): void {
     if (serviceProviderId === "shopify") {
       this.validateShopifyAuthParams(customParams);
     }
   }
 
-  private validateShopifyAuthParams(customParams: Record<string, unknown>): void {
+  private validateShopifyAuthParams(
+    customParams: Record<string, unknown>,
+  ): void {
     if (!customParams?.shop) {
-      throw new StrataError("Shopify authorization requires a 'shop' property containing the merchant shop domain. For example: 'connectstrata.myshopify.com'", SdkErrorCode.InvalidAuthParams);
+      throw new StrataError(
+        "Shopify authorization requires a 'shop' property containing the merchant shop domain. For example: 'connectstrata.myshopify.com'",
+        SdkErrorCode.InvalidAuthParams,
+      );
     }
   }
 
@@ -378,7 +396,10 @@ export default class Strata {
    * @param closeWindow - Whether to close the popup window
    */
   private cleanup(closeWindow: boolean = true) {
-    closeWindow && this.oauthWindow?.close();
+    if (closeWindow) {
+      this.oauthWindow?.close();
+    }
+
     this.oauthWindow = null;
 
     if (this.messageListener) {

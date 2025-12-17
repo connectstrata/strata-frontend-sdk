@@ -1,7 +1,10 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import Strata, { StrataError, AuthorizeOptions } from "@connectstrata/strata-frontend-sdk";
+import Strata, {
+  StrataError,
+  AuthorizeOptions,
+} from "@connectstrata/strata-frontend-sdk";
 
 const providers = [
   {
@@ -19,7 +22,8 @@ const providers = [
   },
   {
     name: "Shopify",
-    description: "Sync orders, customers, and product data from your Shopify store.",
+    description:
+      "Sync orders, customers, and product data from your Shopify store.",
     icon: "/shopify.svg",
     id: "shopify",
   },
@@ -47,7 +51,11 @@ export default function Home() {
         options.customParams = { shop: "connectstrata.myshopify.com" };
       }
 
-      const connectionId = await strata.authorize(data.token, providerId, options);
+      const connectionId = await strata.authorize(
+        data.token,
+        providerId,
+        options,
+      );
       setSuccess(`Authorized ${providerId} connection: ${connectionId}`);
     } catch (err: any) {
       if (err instanceof StrataError) {

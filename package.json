@@ -23,7 +23,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rm -rf dist",
-    "test": "echo 'No tests configured yet'"
+    "test": "echo 'No tests configured yet'",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "lint:format": "npm run lint && npm run format"
   },
   "repository": {
     "type": "git",
@@ -42,7 +45,16 @@
   },
   "homepage": "https://github.com/connectstrata/strata-frontend-sdk#readme",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
+    "jiti": "^2.6.1",
+    "prettier": "^3.7.4",
     "tslib": "^2.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.50.0"
   }
 }
