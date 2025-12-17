@@ -193,6 +193,9 @@ export default class Strata {
   private height: number = 700;
   private oauthWindow: OAuthWindow | null = null;
   private messageListener: ((event: MessageEvent) => void) | null = null;
+  private checkPopupClosedInterval: ReturnType<typeof setInterval> | null =
+    null;
+  private authTimeout: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * Creates a new instance of the Strata SDK
@@ -320,10 +323,9 @@ export default class Strata {
         options?.detectClosedAuthWindow ??
         !DetectClosedAuthWindowDisabledProviders.includes(serviceProviderId);
       if (detectClosed) {
-        const checkPopupClosed = setInterval(() => {
+        this.checkPopupClosedInterval = setInterval(() => {
           if (!this.oauthWindow || !this.oauthWindow.isOpen()) {
             this.logDebug("auth window closed");
-            clearInterval(checkPopupClosed);
             this.cleanup();
             reject(
               new StrataError("Authorization failed", SdkErrorCode.PopupClosed),
@@ -332,7 +334,7 @@ export default class Strata {
         }, 500);
       }
 
-      setTimeout(() => {
+      this.authTimeout = setTimeout(() => {
         this.logDebug("authorization timed out");
         this.cleanup();
         reject(
@@ -396,6 +398,16 @@ export default class Strata {
    * @param closeWindow - Whether to close the popup window
    */
   private cleanup(closeWindow: boolean = true) {
+    if (this.checkPopupClosedInterval) {
+      clearInterval(this.checkPopupClosedInterval);
+      this.checkPopupClosedInterval = null;
+    }
+
+    if (this.authTimeout) {
+      clearTimeout(this.authTimeout);
+      this.authTimeout = null;
+    }
+
     if (closeWindow) {
       this.oauthWindow?.close();
     }
